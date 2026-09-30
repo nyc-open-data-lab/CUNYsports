@@ -2,13 +2,15 @@
 
 `CUNYsports` is an R package for accessing and exploring collegiate athletics data from the **City University of New York (CUNY)**.
 
-The package provides a simple interface for discovering, documenting, and retrieving sports data from an included SQLite database. The database contains information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics.
+The package provides a simple interface for retrieving sports data from an included SQLite database. The database contains information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics.
+
+**Currently, only basketball related data is available. However, work is being done to include *all* sports.**
 
 The project is part of the **CUNY Sports Analytics Initiative** at [The Open Data Lab](https://nycopendatalab.org/).
 
 ## Overview
 
-CUNY athletics data are publicly available across individual college athletics websites, but working with these data at scale can require substantial scraping, cleaning, standardization, and organization.
+CUNY athletics data are publicly available across individual college athletics websites, however, the data is not very accessible.
 
 `CUNYsports` provides a centralized and reproducible way to work with these data in R.
 
@@ -190,7 +192,15 @@ players |>
 
 This workflow can be thought of as:
 
-**Discover → Understand → Retrieve → Analyze**
+```mermaid
+flowchart LR
+    A["Discover"] --> B["Understand"] --> C["Retrieve"] --> D["Analyze"]
+
+    A --- A1["cuny_table_names()<br/>cuny_find_tables()"]
+    B --- B1["cuny_table_info()<br/>cuny_columns_info()"]
+    C --- C1["cuny_pull_table()"]
+    D --- D1["Your analysis"]
+```
 
 ## Database Structure
 
@@ -215,7 +225,7 @@ The current basketball database contains tables covering:
 - Individual game highs
 - Category leaders
 
-Men's and women's basketball records are stored together and can be distinguished using the `gender` variable.
+*Men's* and *women's* basketball records are stored together and can be distinguished using the `gender` variable.
 
 ### Dimension Tables
 
@@ -261,7 +271,7 @@ When finished, disconnect from the database:
 DBI::dbDisconnect(con)
 ```
 
-For most users, `cuny_pull_table()` provides the simplest way to retrieve data. Direct database access is useful when working with larger datasets or when queries should be performed inside SQLite before collecting results into R.
+For most users, `cuny_pull_table()` provides the simplest way to retrieve data.
 
 ## Core Functions
 
@@ -280,11 +290,11 @@ Two catalogs are included with the package:
 
 ### `table_catalog`
 
-Contains table-level metadata describing the structure, coverage, relationships, and potential uses of each database table.
+Contains table-level metadata describing the structure, coverage, relationships, and potential uses of each table in the database.
 
 ### `column_catalog`
 
-Contains column-level metadata describing variables within database tables, including their meaning, data type, example values, and role within the database.
+Contains column-level metadata describing variables within each database table, including their meaning, data type, example values, and role within the database.
 
 The helper functions `cuny_table_info()` and `cuny_columns_info()` provide convenient interfaces to these catalogs.
 
@@ -292,9 +302,9 @@ The helper functions `cuny_table_info()` and `cuny_columns_info()` provide conve
 
 The underlying data are derived from publicly available CUNY athletics websites.
 
-The data engineering pipeline collects and standardizes information across CUNY institutions before constructing analytical and relational tables for distribution through the package.
+The data engineering pipeline collects and standardizes information across CUNY institutions before constructing relational tables for distribution through the package.
 
-Because source websites may vary across institutions and seasons, the project includes substantial cleaning and standardization to make cross-school and longitudinal analysis easier.
+Because websites vary across CUNY schools and seasons, the project includes cleaning and standardization to make cross-school and analysis easier.
 
 ## CUNY Sports Analytics Initiative
 
@@ -311,7 +321,7 @@ The broader initiative uses these data to support projects including:
 - Open-source software
 - Sports journalism and storytelling
 
-The goal is not simply to collect athletics data, but to make those data easier for students, researchers, journalists, fans, and the broader CUNY community to explore and use.
+The goal is not to collect athletics data, but to make those data easier for students, researchers, coaches, fans, and the broader CUNY community to explore and use.
 
 ## Future Development
 
