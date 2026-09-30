@@ -1,0 +1,337 @@
+# CUNYsports
+
+`CUNYsports` is an R package for accessing and exploring collegiate athletics data from the **City University of New York (CUNY)**.
+
+The package provides a simple interface for discovering, documenting, and retrieving sports data from an included SQLite database. The database contains information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics.
+
+The project is part of the **CUNY Sports Analytics Initiative** at [The Open Data Lab](https://nycopendatalab.org/).
+
+## Overview
+
+CUNY athletics data are publicly available across individual college athletics websites, but working with these data at scale can require substantial scraping, cleaning, standardization, and organization.
+
+`CUNYsports` provides a centralized and reproducible way to work with these data in R.
+
+The package includes:
+
+- A SQLite database containing cleaned CUNY athletics data
+- Functions for discovering available tables
+- Search tools for finding relevant datasets
+- Table-level documentation
+- Column-level documentation
+- Functions for retrieving complete tables into R
+- Direct database access for advanced users
+
+The package is designed to support sports analytics, student research, dashboards, scouting reports, data visualization, teaching, and other analyses of CUNY athletics.
+
+## Sports Coverage
+
+The initial release of `CUNYsports` focuses on **CUNY men's and women's basketball**.
+
+Basketball data include:
+
+- Team statistics
+- Player statistics
+- Conference statistics
+- Scoring statistics
+- Player averages
+- Game-by-game statistics
+- Opponent statistics
+- Team game highs
+- Individual game highs
+- Category leaders
+- Schools, seasons, players, games, and opponents
+
+The project is designed to expand to additional CUNY sports over time.
+
+## Installation
+
+You can install the development version of `CUNYsports` from GitHub with:
+
+``` r
+devtools::install_github("nyc-open-data-lab/CUNYsports")
+```
+
+Then load the package:
+
+``` r
+library(CUNYsports)
+```
+
+## Getting Started
+
+`CUNYsports` provides a small set of functions for exploring and accessing the database.
+
+### View Available Tables
+
+Use `cuny_table_names()` to see all tables currently available in the database.
+
+``` r
+cuny_table_names()
+```
+
+This is a useful starting point when exploring the package.
+
+### Search for Tables
+
+If you know what kind of data you want but do not know the exact table name, use `cuny_find_tables()`.
+
+For example:
+
+``` r
+cuny_find_tables("basketball")
+```
+
+You can also search for more specific topics:
+
+``` r
+cuny_find_tables("player")
+cuny_find_tables("game")
+cuny_find_tables("scoring")
+```
+
+The function searches the package's table catalog and returns tables whose metadata match the search term.
+
+### Learn About a Table
+
+Once you identify a table of interest, use `cuny_table_info()` to view its documentation.
+
+``` r
+cuny_table_info("basketball_all_seasons_player_overall_final")
+```
+
+Table metadata include information such as:
+
+- Description
+- Data grain
+- Season coverage
+- Source
+- Potential keys and relationships
+- Likely analytical uses
+- Additional notes
+
+### Learn About the Columns
+
+Use `cuny_columns_info()` to view documentation for the variables contained in a table.
+
+``` r
+cuny_columns_info("basketball_all_seasons_player_overall_final")
+```
+
+The column catalog provides information such as:
+
+- Column name
+- Suggested name
+- Data type
+- Description
+- Example values
+- Key type
+- Additional notes
+
+### Pull a Table into R
+
+Use `cuny_pull_table()` to retrieve a complete database table as an R data frame.
+
+``` r
+player_stats <- cuny_pull_table(
+  "basketball_all_seasons_player_overall_final"
+)
+```
+
+You can then work with the data using standard R tools:
+
+``` r
+library(dplyr)
+
+player_stats |>
+  filter(gender == "W")
+```
+
+or:
+
+``` r
+player_stats |>
+  filter(gender == "M")
+```
+
+## Typical Workflow
+
+A typical `CUNYsports` workflow looks like this:
+
+``` r
+library(CUNYsports)
+library(dplyr)
+
+# See what data are available
+cuny_table_names()
+
+# Find player-related tables
+cuny_find_tables("player")
+
+# Read documentation for a table
+cuny_table_info(
+  "basketball_all_seasons_player_overall_final"
+)
+
+# Examine its columns
+cuny_columns_info(
+  "basketball_all_seasons_player_overall_final"
+)
+
+# Retrieve the data
+players <- cuny_pull_table(
+  "basketball_all_seasons_player_overall_final"
+)
+
+# Begin analysis
+players |>
+  filter(gender == "W")
+```
+
+This workflow can be thought of as:
+
+**Discover → Understand → Retrieve → Analyze**
+
+## Database Structure
+
+`CUNYsports` stores its athletics data in an included SQLite database.
+
+The database uses a relational structure consisting of analytical tables and reusable dimension tables.
+
+### Basketball Tables
+
+The current basketball database contains tables covering:
+
+- Season-level team statistics
+- Player overall statistics
+- Player conference statistics
+- Player scoring statistics
+- Player averages
+- Team summary statistics
+- Game-by-game team statistics
+- Game-by-game opponent statistics
+- Game-by-game comparisons
+- Team game highs
+- Individual game highs
+- Category leaders
+
+Men's and women's basketball records are stored together and can be distinguished using the `gender` variable.
+
+### Dimension Tables
+
+Shared dimension tables provide standardized identifiers and attributes for entities used throughout the database.
+
+These include:
+
+- `dim_seasons`
+- `dim_schools`
+- `dim_players`
+- `dim_games`
+- `dim_opponents`
+- `dim_player_year`
+
+These dimensions support consistent joins and longitudinal analyses across the database.
+
+## Direct Database Access
+
+Advanced users can access the SQLite database directly with `cuny_db()`.
+
+``` r
+con <- cuny_db()
+```
+
+For example:
+
+``` r
+DBI::dbListTables(con)
+```
+
+The connection can also be used with database-backed workflows:
+
+``` r
+dplyr::tbl(
+  con,
+  "basketball_all_seasons_player_overall_final"
+)
+```
+
+When finished, disconnect from the database:
+
+``` r
+DBI::dbDisconnect(con)
+```
+
+For most users, `cuny_pull_table()` provides the simplest way to retrieve data. Direct database access is useful when working with larger datasets or when queries should be performed inside SQLite before collecting results into R.
+
+## Core Functions
+
+| Function              | Purpose                                         |
+|-----------------------|-------------------------------------------------|
+| `cuny_table_names()`  | View all available database tables              |
+| `cuny_find_tables()`  | Search for tables using catalog metadata        |
+| `cuny_table_info()`   | View documentation for a table                  |
+| `cuny_columns_info()` | View documentation for columns in a table       |
+| `cuny_pull_table()`   | Retrieve a complete table into R                |
+| `cuny_db()`           | Open a direct connection to the SQLite database |
+
+## Data Documentation
+
+Two catalogs are included with the package:
+
+### `table_catalog`
+
+Contains table-level metadata describing the structure, coverage, relationships, and potential uses of each database table.
+
+### `column_catalog`
+
+Contains column-level metadata describing variables within database tables, including their meaning, data type, example values, and role within the database.
+
+The helper functions `cuny_table_info()` and `cuny_columns_info()` provide convenient interfaces to these catalogs.
+
+## Data Sources
+
+The underlying data are derived from publicly available CUNY athletics websites.
+
+The data engineering pipeline collects and standardizes information across CUNY institutions before constructing analytical and relational tables for distribution through the package.
+
+Because source websites may vary across institutions and seasons, the project includes substantial cleaning and standardization to make cross-school and longitudinal analysis easier.
+
+## CUNY Sports Analytics Initiative
+
+`CUNYsports` is part of the **CUNY Sports Analytics Initiative**, a project of The Open Data Lab focused on building open data infrastructure for CUNY athletics.
+
+The broader initiative uses these data to support projects including:
+
+- Sports analytics
+- Historical analysis
+- Scouting reports
+- Interactive dashboards
+- Student research
+- Data visualization
+- Open-source software
+- Sports journalism and storytelling
+
+The goal is not simply to collect athletics data, but to make those data easier for students, researchers, journalists, fans, and the broader CUNY community to explore and use.
+
+## Future Development
+
+Planned areas of development include:
+
+- Additional CUNY sports
+- Expanded historical coverage
+- Additional helper functions
+- Improved database documentation
+- Automated data validation
+- Testing infrastructure
+- Tutorials and example analyses
+- Integration with CUNY sports dashboards and other public-facing projects
+
+## About
+
+`CUNYsports` is developed as part of [The Open Data Lab](https://nycopendatalab.org/), an open-source initiative focused on making public and institutional data easier to access, analyze, and use.
+
+The package is developed and maintained by **Christian Martinez** with contributions from students and collaborators working on the CUNY Sports Analytics Initiative.
+
+## License
+
+`CUNYsports` is released under the MIT License.

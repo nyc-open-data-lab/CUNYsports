@@ -1,0 +1,35 @@
+Package: CUNYsports
+Type: Package
+Title: CUNYsports
+Version: 0.1.0
+Authors@R: 
+    person("Christian", "Martinez", 
+             email = "c.martinez0@outlook.com", 
+             role = c("aut", "cre"),
+             comment = c(
+               GitHub = "martinezc1",
+               ORCID = "0009-0005-6026-6454"))
+Description: Provides access to collegiate athletics data from the City University
+    of New York (CUNY). Includes tools for discovering, documenting, and retrieving
+    sports data from an included SQLite database, with data covering teams, players,
+    games, seasons, and other aspects of CUNY athletics.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.5)
+Imports:
+    DBI,
+    dplyr,
+    RSQLite,
+    stringr,
+    rlang,
+    tibble
+Suggests:
+    ggplot2,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://docs.ropensci.org/nycOpenData/, https://github.com/ropensci/nycOpenData
+BugReports: https://github.com/ropensci/nycOpenData/issues
+Config/roxygen2/version: 8.1.0 

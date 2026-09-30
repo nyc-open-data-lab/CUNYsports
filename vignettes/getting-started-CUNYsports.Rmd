@@ -1,0 +1,366 @@
+---
+title: "Getting Started with CUNYsports"
+output: rmarkdown::html_vignette
+author: "Christian Martinez"
+vignette: >
+  %\VignetteIndexEntry{Getting Started with CUNYsports}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(CUNYsports)
+library(dplyr)
+library(ggplot2)
+```
+
+## Introduction
+
+Welcome to `CUNYsports`, an R package for accessing and exploring collegiate athletics data from the **City University of New York (CUNY)**.
+
+CUNY athletics data are publicly available across individual college athletics websites, but working with these data at scale can require substantial scraping, cleaning, standardization, and organization.
+
+`CUNYsports` provides a centralized interface for working with cleaned and organized CUNY athletics data directly in R.
+
+The package includes an SQLite database containing information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics. Rather than requiring users to interact with the database directly, `CUNYsports` provides functions for discovering, documenting, and retrieving the available data.
+
+The basic workflow is:
+
+**Discover → Understand → Retrieve → Analyze**
+
+The initial release of `CUNYsports` focuses on **CUNY men's and women's basketball**, with the database designed to support additional sports in the future.
+
+## Discovering Available Data
+
+The first step when using `CUNYsports` is figuring out what data are available.
+
+### The `cuny_table_names()` function
+
+The simplest way to explore the database is with `cuny_table_names()`.
+
+```{r table-names}
+cuny_table_names()
+```
+
+This returns the names of all tables currently available in the CUNY Sports database.
+
+The database contains both analytical tables and dimension tables. Basketball tables begin with `basketball_`, while dimension tables such as `dim_players` and `dim_schools` provide information used throughout the database.
+
+### The `cuny_find_tables()` function
+
+As the database grows, users may not know the exact name of the table they need.
+
+The `cuny_find_tables()` function allows users to search the table catalog using a keyword.
+
+For example, we can search for tables related to player data:
+
+```{r find-player-tables}
+cuny_find_tables("player")
+```
+
+We could instead search for other topics:
+
+```{r find-tables}
+cuny_find_tables("scoring")
+cuny_find_tables("game")
+```
+
+This provides a convenient way to discover relevant tables without memorizing database table names.
+
+## Understanding a Table
+
+After identifying a table of interest, the next step is understanding what it contains.
+
+For this vignette, we will use:
+
+`basketball_all_seasons_player_overall_final`
+
+This table contains season-level overall player statistics for CUNY basketball.
+
+### The `cuny_table_info()` function
+
+The `cuny_table_info()` function provides table-level documentation.
+
+```{r table-info}
+cuny_table_info(
+  "basketball_all_seasons_player_overall_final"
+)
+```
+
+The returned information describes characteristics such as the table's:
+
+- Description
+- Grain
+- Season coverage
+- Source
+- Potential keys and relationships
+- Likely analytical uses
+- Additional notes
+
+This is particularly useful when several tables contain related types of statistics.
+
+### The `cuny_columns_info()` function
+
+Once we understand the purpose of the table, we can inspect its individual variables using `cuny_columns_info()`.
+
+```{r column-info}
+cuny_columns_info(
+  "basketball_all_seasons_player_overall_final"
+)
+```
+
+The column catalog provides information about each documented variable, including:
+
+- Column name
+- Suggested name
+- Data type
+- Description
+- Example values
+- Key type
+- Additional notes
+
+Together, `cuny_table_info()` and `cuny_columns_info()` allow users to understand the structure of the data before beginning an analysis.
+
+## Retrieving Data
+
+Once we have identified and documented the table we want, we can retrieve it using `cuny_pull_table()`.
+
+```{r pull-player-data}
+player_stats <- cuny_pull_table(
+  "basketball_all_seasons_player_overall_final"
+)
+
+player_stats |>
+  slice_head(n = 6)
+```
+
+The result is returned to R and can be used with familiar tools from packages such as `dplyr`, `tidyr`, and `ggplot2`.
+
+For example, men's and women's basketball records are stored together and can be distinguished using the `gender` column.
+
+To work with women's basketball:
+
+```{r womens-basketball}
+womens_player_stats <- player_stats |>
+  filter(gender == "W")
+
+womens_player_stats |>
+  slice_head(n = 6)
+```
+
+Similarly, men's basketball can be selected using:
+
+```{r mens-basketball}
+mens_player_stats <- player_stats |>
+  filter(gender == "M")
+
+mens_player_stats |>
+  slice_head(n = 6)
+```
+
+## Putting the Workflow Together
+
+At this point, we have completed the basic `CUNYsports` workflow.
+
+We:
+
+1. Discovered available tables using `cuny_table_names()`
+2. Searched for relevant data using `cuny_find_tables()`
+3. Learned about a table using `cuny_table_info()`
+4. Examined its variables using `cuny_columns_info()`
+5. Retrieved the data using `cuny_pull_table()`
+
+In practice, the workflow can be written as:
+
+```{r complete-workflow}
+# Discover
+cuny_find_tables("player")
+
+# Understand
+cuny_table_info(
+  "basketball_all_seasons_player_overall_final"
+)
+
+cuny_columns_info(
+  "basketball_all_seasons_player_overall_final"
+)
+
+# Retrieve
+players <- cuny_pull_table(
+  "basketball_all_seasons_player_overall_final"
+)
+```
+
+From here, the data are ready for analysis.
+
+## Real World Example
+
+Suppose we are interested in exploring scoring across CUNY basketball.
+
+Instead of beginning with the underlying athletics websites, scraping the data, and standardizing records across schools and seasons, we can search the existing CUNY Sports database.
+
+First, let's find tables related to scoring.
+
+```{r scoring-search}
+cuny_find_tables("scoring")
+```
+
+We can then inspect the player scoring table:
+
+```{r scoring-info}
+cuny_table_info(
+  "basketball_all_seasons_player_scoring_final"
+)
+```
+
+And examine its available columns:
+
+```{r scoring-columns}
+cuny_columns_info(
+  "basketball_all_seasons_player_scoring_final"
+)
+```
+
+Now we can retrieve the data:
+
+```{r scoring-data}
+scoring <- cuny_pull_table(
+  "basketball_all_seasons_player_scoring_final"
+)
+
+scoring |>
+  slice_head(n = 6)
+```
+
+Because the data are now in R, we can use normal `dplyr` operations to explore them.
+
+For example, we can examine the distribution of points per game:
+
+```{r scoring-summary}
+scoring |>
+  filter(!is.na(points_per_game)) |>
+  summarize(
+    players = n(),
+    average_ppg = mean(points_per_game),
+    median_ppg = median(points_per_game),
+    maximum_ppg = max(points_per_game)
+  )
+```
+
+We can also compare the distribution of scoring between men's and women's basketball.
+
+```{r scoring-gender-summary}
+scoring |>
+  filter(!is.na(points_per_game)) |>
+  group_by(gender) |>
+  summarize(
+    players = n(),
+    average_ppg = mean(points_per_game),
+    median_ppg = median(points_per_game),
+    maximum_ppg = max(points_per_game),
+    .groups = "drop"
+  )
+```
+
+### Mini Analysis
+
+Finally, we can visualize the distribution of player scoring.
+
+```{r scoring-graph, fig.alt="Histogram showing the distribution of player points per game in CUNY basketball, separated into men's and women's basketball.", fig.cap="Distribution of player points per game in CUNY basketball.", fig.height=5, fig.width=7}
+scoring |>
+  filter(!is.na(points_per_game)) |>
+  ggplot(aes(x = points_per_game)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~ gender) +
+  theme_minimal() +
+  labs(
+    title = "Player Scoring Across CUNY Basketball",
+    subtitle = "Men's and Women's Basketball",
+    x = "Points Per Game",
+    y = "Number of Player-Seasons"
+  )
+```
+
+This simple example demonstrates how `CUNYsports` allows users to move directly from data discovery to analysis using standard R workflows.
+
+## Direct Database Access
+
+For most users, `cuny_pull_table()` provides the easiest way to retrieve data.
+
+Advanced users may instead want to interact directly with the SQLite database.
+
+The `cuny_db()` function opens a database connection:
+
+```{r database-connection}
+con <- cuny_db()
+
+DBI::dbListTables(con)
+
+DBI::dbDisconnect(con)
+```
+
+This can be particularly useful when users want to perform database queries before loading data into memory.
+
+For example, `dplyr` can work directly with a database table:
+
+```{r database-query}
+con <- cuny_db()
+
+player_db <- dplyr::tbl(
+  con,
+  "basketball_all_seasons_player_overall_final"
+)
+
+player_db |>
+  filter(gender == "W") |>
+  select(player_name, season_label, school_id, points_per_game) |>
+  head()
+
+DBI::dbDisconnect(con)
+```
+
+This approach allows SQLite to perform operations before the resulting data are collected into R.
+
+## Rule of Thumb
+
+The package functions serve different parts of the data workflow.
+
+In general:
+
+- Use `cuny_table_names()` to see everything available
+- Use `cuny_find_tables()` when you know the topic but not the table name
+- Use `cuny_table_info()` to understand what a table represents
+- Use `cuny_columns_info()` to understand its variables
+- Use `cuny_pull_table()` when you want the complete table in R
+- Use `cuny_db()` when you want direct access to the SQLite database
+
+For most analyses, the first five functions will provide everything needed to find and begin working with CUNY athletics data.
+
+## Summary
+
+`CUNYsports` provides a centralized interface for accessing and exploring CUNY athletics data in R.
+
+Rather than requiring users to independently scrape and standardize statistics across athletics websites, the package provides cleaned data through an included SQLite database together with tools for understanding its structure.
+
+The basic workflow is:
+
+**Discover → Understand → Retrieve → Analyze**
+
+As demonstrated in this vignette, users can search for relevant data, inspect table and column documentation, retrieve complete datasets, and immediately begin analyzing them using familiar R tools.
+
+Although the initial release focuses on men's and women's basketball, the underlying database and package infrastructure are designed to support additional CUNY sports as the project grows.
+
+## How to Cite
+
+If you use `CUNYsports` for research or educational purposes, please cite it as follows:
+
+Martinez C (2026). *CUNYsports: Access and Explore CUNY Athletics Data*. R package version 0.1.0.
