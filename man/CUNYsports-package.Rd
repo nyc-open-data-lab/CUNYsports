@@ -12,9 +12,9 @@ City University of New York (CUNY).
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://docs.ropensci.org/nycOpenData/}
-  \item \url{https://github.com/ropensci/nycOpenData}
-  \item Report bugs at \url{https://github.com/ropensci/nycOpenData/issues}
+  \item \url{https://nyc-open-data-lab.github.io/CUNYsports/}
+  \item \url{https://github.com/nyc-open-data-lab/CUNYsports}
+  \item Report bugs at \url{https://github.com/nyc-open-data-lab/CUNYsports/issues}
 }
 
 }

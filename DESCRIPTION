@@ -11,7 +11,7 @@ Authors@R:
                ORCID = "0009-0005-6026-6454"))
 Description: Provides access to collegiate athletics data from the City University
     of New York (CUNY). Includes tools for discovering, documenting, and retrieving
-    sports data from an included SQLite database, with data covering teams, players,
+    sports data from an included SQLite database. The data covers teams, players,
     games, seasons, and other aspects of CUNY athletics.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -30,6 +30,6 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://docs.ropensci.org/nycOpenData/, https://github.com/ropensci/nycOpenData
-BugReports: https://github.com/ropensci/nycOpenData/issues
+URL: https://nyc-open-data-lab.github.io/CUNYsports/, https://github.com/nyc-open-data-lab/CUNYsports
+BugReports: https://github.com/nyc-open-data-lab/CUNYsports/issues
 Config/roxygen2/version: 8.1.0 
