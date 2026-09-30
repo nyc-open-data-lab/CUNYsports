@@ -55,12 +55,13 @@
 <div class="page-header"><h1 id="cunysports">CUNYsports<a class="anchor" aria-label="anchor" href="#cunysports"></a>
 </h1></div>
 <p><code>CUNYsports</code> is an R package for accessing and exploring collegiate athletics data from the <strong>City University of New York (CUNY)</strong>.</p>
-<p>The package provides a simple interface for discovering, documenting, and retrieving sports data from an included SQLite database. The database contains information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics.</p>
+<p>The package provides a simple interface for retrieving sports data from an included SQLite database. The database contains information about teams, players, games, seasons, schools, opponents, and other aspects of CUNY athletics.</p>
+<p><strong>Currently, only basketball related data is available. However, work is being done to include <em>all</em> sports.</strong></p>
 <p>The project is part of the <strong>CUNY Sports Analytics Initiative</strong> at <a href="https://nycopendatalab.org/" class="external-link">The Open Data Lab</a>.</p>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>CUNY athletics data are publicly available across individual college athletics websites, but working with these data at scale can require substantial scraping, cleaning, standardization, and organization.</p>
+<p>CUNY athletics data are publicly available across individual college athletics websites, however, the data is not very accessible.</p>
 <p><code>CUNYsports</code> provides a centralized and reproducible way to work with these data in R.</p>
 <p>The package includes:</p>
 <ul>
@@ -217,7 +218,13 @@
 <span><span class="va">players</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"W"</span><span class="op">)</span></span></code></pre></div>
 <p>This workflow can be thought of as:</p>
-<p><strong>Discover → Understand → Retrieve → Analyze</strong></p>
+<pre class="mermaid"><code>flowchart LR
+    A["Discover"] --&gt; B["Understand"] --&gt; C["Retrieve"] --&gt; D["Analyze"]
+
+    A --- A1["cuny_table_names()&lt;br/&gt;cuny_find_tables()"]
+    B --- B1["cuny_table_info()&lt;br/&gt;cuny_columns_info()"]
+    C --- C1["cuny_pull_table()"]
+    D --- D1["Your analysis"]</code></pre>
 </div>
 <div class="section level2">
 <h2 id="database-structure">Database Structure<a class="anchor" aria-label="anchor" href="#database-structure"></a>
@@ -242,7 +249,7 @@
 <li>Individual game highs</li>
 <li>Category leaders</li>
 </ul>
-<p>Men’s and women’s basketball records are stored together and can be distinguished using the <code>gender</code> variable.</p>
+<p><em>Men’s</em> and <em>women’s</em> basketball records are stored together and can be distinguished using the <code>gender</code> variable.</p>
 </div>
 <div class="section level3">
 <h3 id="dimension-tables">Dimension Tables<a class="anchor" aria-label="anchor" href="#dimension-tables"></a>
@@ -264,21 +271,21 @@
 <h2 id="direct-database-access">Direct Database Access<a class="anchor" aria-label="anchor" href="#direct-database-access"></a>
 </h2>
 <p>Advanced users can access the SQLite database directly with <code><a href="reference/cuny_db.html">cuny_db()</a></code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cuny_db.html">cuny_db</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>For example:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
 <p>The connection can also be used with database-backed workflows:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span></span>
 <span>  <span class="va">con</span>,</span>
 <span>  <span class="st">"basketball_all_seasons_player_overall_final"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>When finished, disconnect from the database:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
-<p>For most users, <code><a href="reference/cuny_pull_table.html">cuny_pull_table()</a></code> provides the simplest way to retrieve data. Direct database access is useful when working with larger datasets or when queries should be performed inside SQLite before collecting results into R.</p>
+<p>For most users, <code><a href="reference/cuny_pull_table.html">cuny_pull_table()</a></code> provides the simplest way to retrieve data.</p>
 </div>
 <div class="section level2">
 <h2 id="core-functions">Core Functions<a class="anchor" aria-label="anchor" href="#core-functions"></a>
@@ -328,13 +335,13 @@
 <h3 id="table_catalog">
 <code>table_catalog</code><a class="anchor" aria-label="anchor" href="#table_catalog"></a>
 </h3>
-<p>Contains table-level metadata describing the structure, coverage, relationships, and potential uses of each database table.</p>
+<p>Contains table-level metadata describing the structure, coverage, relationships, and potential uses of each table in the database.</p>
 </div>
 <div class="section level3">
 <h3 id="column_catalog">
 <code>column_catalog</code><a class="anchor" aria-label="anchor" href="#column_catalog"></a>
 </h3>
-<p>Contains column-level metadata describing variables within database tables, including their meaning, data type, example values, and role within the database.</p>
+<p>Contains column-level metadata describing variables within each database table, including their meaning, data type, example values, and role within the database.</p>
 <p>The helper functions <code><a href="reference/cuny_table_info.html">cuny_table_info()</a></code> and <code><a href="reference/cuny_columns_info.html">cuny_columns_info()</a></code> provide convenient interfaces to these catalogs.</p>
 </div>
 </div>
@@ -342,8 +349,8 @@
 <h2 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h2>
 <p>The underlying data are derived from publicly available CUNY athletics websites.</p>
-<p>The data engineering pipeline collects and standardizes information across CUNY institutions before constructing analytical and relational tables for distribution through the package.</p>
-<p>Because source websites may vary across institutions and seasons, the project includes substantial cleaning and standardization to make cross-school and longitudinal analysis easier.</p>
+<p>The data engineering pipeline collects and standardizes information across CUNY institutions before constructing relational tables for distribution through the package.</p>
+<p>Because websites vary across CUNY schools and seasons, the project includes cleaning and standardization to make cross-school and analysis easier.</p>
 </div>
 <div class="section level2">
 <h2 id="cuny-sports-analytics-initiative">CUNY Sports Analytics Initiative<a class="anchor" aria-label="anchor" href="#cuny-sports-analytics-initiative"></a>
@@ -360,7 +367,7 @@
 <li>Open-source software</li>
 <li>Sports journalism and storytelling</li>
 </ul>
-<p>The goal is not simply to collect athletics data, but to make those data easier for students, researchers, journalists, fans, and the broader CUNY community to explore and use.</p>
+<p>The goal is not to collect athletics data, but to make those data easier for students, researchers, coaches, fans, and the broader CUNY community to explore and use.</p>
 </div>
 <div class="section level2">
 <h2 id="future-development">Future Development<a class="anchor" aria-label="anchor" href="#future-development"></a>
