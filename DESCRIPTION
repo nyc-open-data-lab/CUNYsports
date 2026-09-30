@@ -28,7 +28,8 @@ Imports:
 Suggests:
     ggplot2,
     knitr,
-    rmarkdown
+    rmarkdown,
+    dbplyr
 VignetteBuilder: knitr
 URL: https://nyc-open-data-lab.github.io/CUNYsports/, https://github.com/nyc-open-data-lab/CUNYsports
 BugReports: https://github.com/nyc-open-data-lab/CUNYsports/issues
