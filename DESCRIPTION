@@ -1,6 +1,6 @@
 Package: CUNYsports
 Type: Package
-Title: CUNYsports
+Title: Accessible Collegiate Athletics Data From the City University of New York (CUNY)
 Version: 0.1.0
 Authors@R: 
     person("Christian", "Martinez", 
@@ -10,9 +10,11 @@ Authors@R:
                GitHub = "martinezc1",
                ORCID = "0009-0005-6026-6454"))
 Description: Provides access to collegiate athletics data from the City University
-    of New York (CUNY). Includes tools for discovering, documenting, and retrieving
-    sports data from an included SQLite database. The data covers teams, players,
-    games, seasons, and other aspects of CUNY athletics.
+    of New York (CUNY), the largest urban public university system in the United
+    States. Includes tools for discovering and retrieving sports data from an
+    included SQLite database. The data covers individual CUNY schools, players, 
+    games, seasons, and other aspects of CUNY athletics, providing accessible datasets for
+    teaching, student learning, and sports analytics.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

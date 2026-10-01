@@ -6,7 +6,7 @@ The package provides a simple interface for retrieving sports data from an inclu
 
 **Currently, only basketball related data is available. However, work is being done to include *all* sports.**
 
-The project is part of the **CUNY Sports Analytics Initiative** at [The Open Data Lab](https://nycopendatalab.org/).
+The project is part of the **CUNY Sports Analytics Initiative** at [The Open Data Lab](https://martinezc1-nyc-open-data-lab.share.connect.posit.cloud/).
 
 ## Overview
 
