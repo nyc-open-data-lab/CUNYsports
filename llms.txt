@@ -12,7 +12,8 @@ CUNY athletics.
 being done to include *all* sports.**
 
 The project is part of the **CUNY Sports Analytics Initiative** at [The
-Open Data Lab](https://nycopendatalab.org/).
+Open Data
+Lab](https://martinezc1-nyc-open-data-lab.share.connect.posit.cloud/).
 
 ## Overview
 
